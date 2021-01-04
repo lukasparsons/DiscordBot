@@ -22,21 +22,18 @@ namespace DiscordBot.Controllers
             this.client = client;
         }
 
-        [Route("online")]
-        public IEnumerable<string> GetOnlineUsers(string servername)
+        [Route("online/{serverId}")]
+        public IEnumerable<string> GetOnlineUsers(ulong serverId)
         {
-            servername = "gatewood";    // Temporarily hard code until we can figure out how to parse this data from somewhere.
-            var serverId = ClientHelper.GetGuildIdFromServerName(servername);
+            serverId = ServerIds.Gatewood;
 
             DiscordGuild guild;
             client.Guilds.TryGetValue(serverId, out guild);
 
 
-            var memberList = guild.VoiceStates.Where(vs => vs.Channel != guild.AfkChannel && vs.Channel != null).Select(vs => vs.User.Username);
-
-            return memberList;
+            var memberList = guild.VoiceStates.Where(vs => vs.Channel != guild.AfkChannel && vs.Channel != null).Select(vs => vs.User);
+            var usernameList = memberList.Select(u => u.Username);
+            return usernameList;
         }
-
-
     }
 }
